@@ -17,3 +17,12 @@
 **Codex caught:** Reconciled the requested non-throwing empty-input behaviour with the original Diagnosis-only signature through the approved discriminated union. Preserved punctuation-only input as valid because whitespace-only input is the sole error case, and removed an unused destructured field caught by strict linting.
 
 **Verified by:** Vitest passed all 35 tests, including fixed mappings, determinism, eight-scenario coverage, action completeness, stage ordering, Roman-only Hindi, and the non-empty-input invariant. ESLint, strict TypeScript, npm audit, and the Next.js production build also passed; First Load JS remained 103 kB.
+
+## Task 3 — Citizen trace journey
+**Asked:** Correct two Roman-Hindi strings and build the mobile-first `/trace` journey through the diagnosis headline, without implementing the detailed action card.
+
+**Codex did:** Used frontend-skill for a cardless printed-notice composition, built the owner choice and demo entry flow, split the five-stage timeline into its own component, added accessible inline SVG status indicators and a reduced-motion-safe CSS reveal, and used lean-code to consolidate one-purpose button handlers. Used Playwright for functional, keyboard, overflow, console, motion, and visual checks at 360px first, then 768px and 1280px; used vercel-deploy for the production release.
+
+**Codex caught:** The first visual capture occurred while the CSS timeline was still revealing, so Codex separated in-transition and settled-state inspection before judging the failed-stage hierarchy. The lean audit removed redundant state-setter wrappers, a demo-button closure, and the temporary browser harness from the repository.
+
+**Verified by:** All 35 Vitest tests, ESLint, strict TypeScript, npm audit, and the production build passed. `/trace` measured 110 kB First Load JS. Fresh Playwright contexts confirmed all four demo cases and an arbitrary F8 input produced complete five-stage traces locally and on the public production URL, with no login, horizontal overflow, or console errors.

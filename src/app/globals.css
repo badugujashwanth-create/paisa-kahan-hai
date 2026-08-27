@@ -21,3 +21,27 @@ a {
 :focus-visible {
   @apply outline-3 outline-offset-3 outline-accent;
 }
+
+@keyframes trace-stage-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.trace-stage {
+  --trace-step-delay: 240ms;
+  animation: trace-stage-reveal 320ms ease-out both;
+  animation-delay: calc(var(--trace-stage-index) * var(--trace-step-delay));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trace-stage {
+    animation: none;
+  }
+}

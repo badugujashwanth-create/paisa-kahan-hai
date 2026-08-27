@@ -1,5 +1,11 @@
 # Sessions
 
+## 2026-08-28 — Citizen trace journey
+- Built the working `/trace` entry flow, owner choice, demo picker, five-stage timeline, diagnosis, and action placeholder.
+- Made failed stages full-width red interruptions, kept F8 reassuring, and added a reduced-motion-safe CSS reveal under two seconds.
+- Corrected F4/F8 Roman-Hindi phrasing and added a regression test that blocks gendered future-verb endings.
+- Current state: 35 tests and all checks pass; production is public at `https://paisa-kahan-hai-hazel.vercel.app` with 110 kB First Load JS on `/trace`.
+
 ## 2026-08-28 — Five-stage diagnosis engine
 - Built typed payment stages, eight complete scenarios, four fixed demo cases, deterministic fallback diagnosis, and Vitest coverage.
 - Empty input returns one citizen-facing typed error; every non-empty string returns a complete diagnosis, and F8 has no failed stage.

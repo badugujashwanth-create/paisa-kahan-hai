@@ -6,6 +6,8 @@ import {
   type StageResult,
 } from "./types";
 
+// Roman-Hindi uses gender-neutral infinitive phrasing because the app cannot know who is speaking.
+
 type TerminalStageResult = Readonly<{
   status: "FAILED" | "PENDING";
   explanation: string;
@@ -224,7 +226,7 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       whatToSay:
         "Please compare my name, date of birth, and gender with Aadhaar and correct the wrong bank field using the CIF Correction Form.",
       whatToSayHindiRoman:
-        "Mera bank record aur Aadhaar ka naam, janm tithi ya ling mil nahi raha. Kripya sahi record dekhkar CIF Correction Form se bank record theek kijiye.",
+        "Mere bank record aur Aadhaar mein naam, janm tithi ya ling alag hai. Kripya sahi record dekhkar CIF Correction Form se bank record theek kijiye.",
       clerkPushback: "You must change Aadhaar first.",
       yourReply:
         "Please first show me which record is wrong. If Aadhaar is correct, changing the bank record is usually free, faster, and needs only branch verification. I will visit an Aadhaar centre only if Aadhaar itself is wrong.",
@@ -383,7 +385,7 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       whatToSay:
         "No action is needed today. I will check the payment again after 3 September 2026.",
       whatToSayHindiRoman:
-        "Mera payment abhi prakriya mein hai. Main 3 September 2026 ke baad dobara sthiti dekhunga.",
+        "Abhi koi kaam nahi hai. Teen September 2026 ke baad dobara status dekhna hai.",
       clerkPushback: "Visit the bank now to make sure your account is linked.",
       yourReply:
         "The payment has not reached the mapper or bank yet, and it is still within normal processing time. I will wait until the check date.",

@@ -16,6 +16,7 @@ const FIXED_CASE_EXPECTATIONS: Readonly<Record<string, FailureCode>> = {
   "100000000004": "F5",
 };
 const DEVANAGARI_CHARACTERS = /[\u0900-\u097f]/u;
+const GENDERED_ROMAN_HINDI_VERB_ENDINGS = /a?u?ng[ai]/iu;
 
 /** Unwrap a successful result for assertions that use known non-empty input. */
 function getDiagnosis(input: string): Diagnosis {
@@ -110,6 +111,9 @@ describe("scenario completeness", () => {
       expect(action.yourReply.trim()).not.toBe("");
       expect(action.fieldProvenance.whatToSayHindiRoman).toBe("VERIFIED");
       expect(action.whatToSayHindiRoman).not.toMatch(DEVANAGARI_CHARACTERS);
+      expect(action.whatToSayHindiRoman).not.toMatch(
+        GENDERED_ROMAN_HINDI_VERB_ENDINGS,
+      );
     },
   );
 
@@ -148,4 +152,3 @@ describe("scenario completeness", () => {
     expect(SCENARIOS.F8.humanHeadline).toMatch(/normally/i);
   });
 });
-
