@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import { DEMO_CASES } from "./cases";
 import { diagnose } from "./engine";
-import { SCENARIOS } from "./scenarios";
+import {
+  AADHAAR_SEEDING_FORM_NAME,
+  FORM_ANNEXURE_HINT,
+  SCENARIOS,
+} from "./scenarios";
 import type { Diagnosis, FailureCode } from "./types";
 
 const DETERMINISM_RUNS = 100;
@@ -104,6 +108,10 @@ describe("scenario completeness", () => {
     (scenario) => {
       const action = scenario.citizenAction;
 
+      expect(action.beforeYouTravel.trim()).not.toBe("");
+      expect(["CITED", "MODELLED"]).toContain(
+        action.beforeYouTravelProvenance,
+      );
       expect(action.exactFormName.trim()).not.toBe("");
       expect(action.whatToSay.trim()).not.toBe("");
       expect(action.whatToSayHindiRoman.trim()).not.toBe("");
@@ -150,5 +158,40 @@ describe("scenario completeness", () => {
   it("uses no failed stage for the normal in-flight scenario", () => {
     expect(SCENARIOS.F8.failedStage).toBeNull();
     expect(SCENARIOS.F8.humanHeadline).toMatch(/normally/i);
+  });
+
+  it("does not claim primary citations for the modelled B08 and 207 code labels", () => {
+    expect(
+      SCENARIOS.F3.stages.find((stage) =>
+        stage.technicalDetail?.includes("B08"),
+      )?.provenance,
+    ).toBe("MODELLED");
+    expect(
+      SCENARIOS.F4.stages.find((stage) =>
+        stage.technicalDetail?.includes("207"),
+      )?.provenance,
+    ).toBe("MODELLED");
+    expect(SCENARIOS.F3.provenance).toBe("MODELLED");
+    expect(SCENARIOS.F4.provenance).toBe("MODELLED");
+  });
+
+  it("uses the unambiguous NPCI form name and keeps annexure wording as a hint", () => {
+    for (const failureCode of ["F1", "F2", "F3"] as const) {
+      expect(SCENARIOS[failureCode].citizenAction.exactFormName).toBe(
+        AADHAAR_SEEDING_FORM_NAME,
+      );
+    }
+
+    expect(FORM_ANNEXURE_HINT).toMatch(/Annexure-I/);
+    expect(FORM_ANNEXURE_HINT).toMatch(/varies between banks/i);
+  });
+
+  it("makes the one-bank mapper rule and previous bank explicit", () => {
+    expect(SCENARIOS.F1.explanation).toMatch(/one bank per Aadhaar/i);
+    expect(SCENARIOS.F1.explanation).toMatch(/overwrites the previous mapping/i);
+    expect(SCENARIOS.F2.explanation).toMatch(/one bank per Aadhaar/i);
+    expect(SCENARIOS.F2.explanation).toMatch(/overwrites the previous mapping/i);
+    expect(SCENARIOS.F2.citizenAction.whatToSay).toMatch(/another bank/i);
+    expect(SCENARIOS.F2.citizenAction.whatToSay).toMatch(/if I know it/i);
   });
 });

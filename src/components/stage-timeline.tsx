@@ -142,6 +142,7 @@ export function StageTimeline({ stages }: StageTimelineProps) {
                 ? "-mx-5 border-y-4 border-error bg-error px-5 py-7 text-paper sm:-mx-8 sm:px-8"
                 : "py-6"
             } ${stage.status === "NOT_REACHED" ? "opacity-60" : ""}`}
+            data-stage-status={stage.status}
             key={stage.stageId}
             style={timelineStyle}
           >

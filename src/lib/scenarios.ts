@@ -7,6 +7,7 @@ import {
 } from "./types";
 
 // Roman-Hindi uses gender-neutral infinitive phrasing because the app cannot know who is speaking.
+// Primary NPCI documentation for the exact APBS response-code labels B08 and 207 could not be located, so those labels are MODELLED rather than CITED.
 
 type TerminalStageResult = Readonly<{
   status: "FAILED" | "PENDING";
@@ -15,8 +16,16 @@ type TerminalStageResult = Readonly<{
   provenance: StageResult["provenance"];
 }>;
 
-const AADHAAR_SEEDING_FORM_NAME = "Aadhaar Seeding Consent Form (Annexure-I)";
+// NPCI's APBS Standard Operating Procedure calls the consent form Annexure II, while bank counters often say Annexure I; its functional name stays unambiguous when annexure numbering varies.
+export const AADHAAR_SEEDING_FORM_NAME =
+  "NPCI Aadhaar Seeding / DBT Consent Form";
+export const FORM_ANNEXURE_HINT =
+  "Often called Annexure-I at the counter. The annexure number varies between banks — ask for it by the name above.";
 const NO_FORM_REQUIRED = "No form is required";
+
+// A free USSD lookup can prevent wasted bus fare for someone without a smartphone or mobile data.
+const BANK_MAPPING_CHECK_BEFORE_TRAVEL =
+  "Dial *99*99# from any phone — no internet needed — to check which bank currently holds your Aadhaar mapping. This is NPCI's free Query Service on Aadhaar Mapper. You can also check the BASE portal on npci.org.in or call NPCI on 1800-120-1740.";
 
 const PASSED_STAGE_RESULTS: Readonly<Record<StageId, Omit<StageResult, "stageId">>> = {
   SCHEME: {
@@ -91,7 +100,7 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
     humanHeadline: "Your Aadhaar has no DBT bank",
     failedStage: "MAPPER",
     explanation:
-      "The payment reached NPCI, but NPCI could not find a bank chosen to receive DBT money for your Aadhaar number.",
+      "The NPCI mapper holds one bank per Aadhaar, and a fresh seeding overwrites the previous mapping. For this Aadhaar, the mapper currently holds no bank, so NPCI had nowhere to send the payment.",
     stages: buildStageResults("MAPPER", {
       status: "FAILED",
       explanation: "No active DBT bank was found for your Aadhaar number.",
@@ -99,16 +108,18 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       provenance: "CITED",
     }),
     citizenAction: {
+      beforeYouTravel: BANK_MAPPING_CHECK_BEFORE_TRAVEL,
+      beforeYouTravelProvenance: "CITED",
       whereToGo: "The branch of the bank account where you want future payments.",
       whoToAsk: "The officer handling Aadhaar DBT seeding.",
       exactFormName: AADHAAR_SEEDING_FORM_NAME,
       whatToSay:
-        "I need this account seeded in the NPCI mapper for DBT. Please give me the Aadhaar Seeding Consent Form, Annexure-I.",
+        "I need this account seeded in the NPCI mapper for DBT. Please give me the NPCI Aadhaar Seeding / DBT Consent Form.",
       whatToSayHindiRoman:
-        "Mujhe is khate ko NPCI DBT mapper mein seed karne ke liye Aadhaar Seeding Consent Form, Annexure-I chahiye.",
+        "Mujhe is khate ko NPCI DBT mapper mein seed karne ke liye NPCI Aadhaar Seeding / DBT Consent Form chahiye.",
       clerkPushback: "Your Aadhaar is already linked to this account.",
       yourReply:
-        "Linked for bank KYC is not the same as seeded in the NPCI mapper for DBT. Please check the NPCI mapper status and process Annexure-I.",
+        "Linked for bank KYC is not the same as seeded in the NPCI mapper for DBT. Please check the NPCI mapper status and process the NPCI Aadhaar Seeding / DBT Consent Form.",
       documentsToBring: [
         "Aadhaar card or a clear copy",
         "Bank passbook",
@@ -131,7 +142,7 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
     humanHeadline: "Your payment went to a different bank account",
     failedStage: "MAPPER",
     explanation:
-      "A later Aadhaar seeding replaced the earlier NPCI mapping. The payment was sent to the bank seeded most recently, which may hold an older or closed account for you.",
+      "The NPCI mapper holds one bank per Aadhaar. A fresh seeding overwrites the previous mapping, so the payment went to the bank seeded most recently, which may hold an older or closed account for you.",
     stages: buildStageResults("MAPPER", {
       status: "FAILED",
       explanation: "NPCI found a different bank from the one where you expected the money.",
@@ -139,16 +150,18 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       provenance: "CITED",
     }),
     citizenAction: {
+      beforeYouTravel: BANK_MAPPING_CHECK_BEFORE_TRAVEL,
+      beforeYouTravelProvenance: "CITED",
       whereToGo: "The branch of the bank where you want future DBT money to arrive.",
       whoToAsk: "The officer handling Aadhaar DBT seeding.",
       exactFormName: AADHAAR_SEEDING_FORM_NAME,
       whatToSay:
-        "I want DBT payments in this account. Please use Annexure-I to seed this bank as my latest bank in the NPCI mapper.",
+        "I want DBT payments in this account. My DBT may currently go to another bank, whose name I will give you if I know it. Please use the NPCI Aadhaar Seeding / DBT Consent Form to seed this bank as my latest bank in the NPCI mapper.",
       whatToSayHindiRoman:
-        "Mujhe DBT ka paisa isi khate mein chahiye. Kripya Aadhaar Seeding Consent Form, Annexure-I lekar NPCI mapper mein is bank ko naya seed kijiye.",
+        "Mujhe DBT ka paisa isi khate mein chahiye. Kripya NPCI Aadhaar Seeding / DBT Consent Form lekar NPCI mapper mein is bank ko naya seed kijiye.",
       clerkPushback: "Your Aadhaar is already linked, so no change is needed.",
       yourReply:
-        "Bank linking for KYC is separate from NPCI DBT seeding. NPCI uses the bank seeded most recently, so please process a fresh Annexure-I for this bank.",
+        "Bank linking for KYC is separate from NPCI DBT seeding. NPCI uses the bank seeded most recently, so please process a fresh NPCI Aadhaar Seeding / DBT Consent Form for this bank.",
       documentsToBring: [
         "Aadhaar card or a clear copy",
         "Passbook for the account where you want the money",
@@ -176,9 +189,11 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       status: "FAILED",
       explanation: "The bank's Aadhaar mandate is missing from the central mapper.",
       technicalDetail: "APBS response code B08",
-      provenance: "CITED",
+      provenance: "MODELLED",
     }),
     citizenAction: {
+      beforeYouTravel: BANK_MAPPING_CHECK_BEFORE_TRAVEL,
+      beforeYouTravelProvenance: "CITED",
       whereToGo: "The branch where you submitted Aadhaar seeding.",
       whoToAsk: "The Branch Manager, not the counter clerk.",
       exactFormName: AADHAAR_SEEDING_FORM_NAME,
@@ -190,7 +205,7 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       yourReply:
         "NPCI says Aadhaar mapper seeding is the bank's responsibility. Please check the bank's upload and give me a written complaint number.",
       documentsToBring: [
-        "Bank-acknowledged copy of Annexure-I, if available",
+        "Bank-acknowledged copy of the NPCI Aadhaar Seeding / DBT Consent Form, if available",
         "Aadhaar card or a clear copy",
         "Bank passbook",
         "Payment failure screenshot showing B08",
@@ -205,7 +220,7 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       },
     },
     traceCase: GENERIC_TRACE_CASE,
-    provenance: "CITED",
+    provenance: "MODELLED",
   },
   F4: {
     failureCode: "F4",
@@ -217,9 +232,12 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       status: "FAILED",
       explanation: "The personal details in the bank and Aadhaar records did not match.",
       technicalDetail: "APBS response code 207",
-      provenance: "CITED",
+      provenance: "MODELLED",
     }),
     citizenAction: {
+      beforeYouTravel:
+        "Call your bank branch before travelling and ask where it handles name, date of birth, or gender corrections. Carry your Aadhaar and passbook only after the branch confirms where to go.",
+      beforeYouTravelProvenance: "MODELLED",
       whereToGo: "Your bank branch first, with your Aadhaar details and bank passbook.",
       whoToAsk: "The officer handling customer information or re-KYC corrections.",
       exactFormName: "Customer Information Update Form (CIF Correction Form)",
@@ -246,7 +264,7 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       },
     },
     traceCase: GENERIC_TRACE_CASE,
-    provenance: "CITED",
+    provenance: "MODELLED",
   },
   F5: {
     failureCode: "F5",
@@ -261,6 +279,8 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       provenance: "MODELLED",
     }),
     citizenAction: {
+      beforeYouTravel: BANK_MAPPING_CHECK_BEFORE_TRAVEL,
+      beforeYouTravelProvenance: "CITED",
       whereToGo: "The branch that holds the inactive account.",
       whoToAsk: "The account service or re-KYC officer.",
       exactFormName: "Re-KYC Form and Account Activation Request",
@@ -302,6 +322,9 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       provenance: "MODELLED",
     }),
     citizenAction: {
+      beforeYouTravel:
+        "You do not need to travel to the bank. Call the block or panchayat office first and ask whether your beneficiary verification is pending; travel only if they ask you to bring documents.",
+      beforeYouTravelProvenance: "MODELLED",
       whereToGo: "Your block office or panchayat office, not the bank.",
       whoToAsk: "The officer who verifies beneficiaries for your scheme.",
       exactFormName: "Beneficiary Verification Form",
@@ -343,6 +366,9 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       provenance: "MODELLED",
     }),
     citizenAction: {
+      beforeYouTravel:
+        "You do not need to travel. No bank or office can release the budget today; check again after 15 September 2026.",
+      beforeYouTravelProvenance: "MODELLED",
       whereToGo: "Do not travel to the bank; check the scheme portal or helpline from home.",
       whoToAsk: "The scheme helpline only if the status is unchanged after the check date.",
       exactFormName: NO_FORM_REQUIRED,
@@ -379,6 +405,9 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       provenance: "MODELLED",
     }),
     citizenAction: {
+      beforeYouTravel:
+        "You do not need to travel. The payment is still within normal processing time; check the status again after 3 September 2026.",
+      beforeYouTravelProvenance: "MODELLED",
       whereToGo: "Nowhere today; check the payment status again from home.",
       whoToAsk: "No clerk is needed unless the status is unchanged after the check date.",
       exactFormName: NO_FORM_REQUIRED,

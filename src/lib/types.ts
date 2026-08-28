@@ -14,6 +14,8 @@ export type StageResult = Readonly<{
 }>;
 
 export type CitizenAction = Readonly<{
+  beforeYouTravel: string;
+  beforeYouTravelProvenance: Provenance;
   whereToGo: string;
   whoToAsk: string;
   exactFormName: string;

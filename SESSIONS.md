@@ -1,5 +1,11 @@
 # Sessions
 
+## 2026-08-28 — Citizen action, print output, and home entry
+- Corrected APBS provenance, replaced annexure-dependent form naming, and added before-travel guidance to all eight scenarios.
+- Rebuilt `/` as the live entry point and replaced the trace placeholder with complete counter-ready instructions, pushback replies, and a wait-only path for F7/F8.
+- Added compact black-and-white A4 print output with prominent Roman Hindi, plus 360px-first Playwright coverage at three widths.
+- Current state: 38 tests and all checks pass; production is public with 112 kB First Load JS on `/trace`.
+
 ## 2026-08-28 — Citizen trace journey
 - Built the working `/trace` entry flow, owner choice, demo picker, five-stage timeline, diagnosis, and action placeholder.
 - Made failed stages full-width red interruptions, kept F8 reassuring, and added a reduced-motion-safe CSS reveal under two seconds.
