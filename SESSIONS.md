@@ -1,5 +1,9 @@
 # Sessions
 
+## 2026-08-28 — Contact correction, self-check links, and escalation
+- Replaced the misapplied BHIM/UPI helpline with sourced DigiSaathi numbers plus NPCI's mapper-specific APBS email; linked the real self-check tools and rendered the sourced five-rung ladder for F1–F6.
+- Current state: 75 tests and all checks pass; production is public, `/trace` is 118 kB First Load JS, and the complete escalation printout fits four A4 pages.
+
 ## 2026-08-28 — Deep-linked results and repository freeze
 - Added initial-load `id` deep links, removed the unlinked `/language` stub, and wrote the public reviewer README.
 - Kept URL handling one-way and local to `/trace`; current state is public, with 38 tests passing and 116 kB local First Load JS on `/trace`.

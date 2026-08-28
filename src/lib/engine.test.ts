@@ -21,6 +21,7 @@ const FIXED_CASE_EXPECTATIONS: Readonly<Record<string, FailureCode>> = {
 };
 const DEVANAGARI_CHARACTERS = /[\u0900-\u097f]/u;
 const GENDERED_ROMAN_HINDI_VERB_ENDINGS = /a?u?ng[ai]/iu;
+const INCORRECT_BHIM_HELPLINE = ["1800", "120", "1740"].join("-");
 
 /** Unwrap a successful result for assertions that use known non-empty input. */
 function getDiagnosis(input: string): Diagnosis {
@@ -193,5 +194,19 @@ describe("scenario completeness", () => {
     expect(SCENARIOS.F2.explanation).toMatch(/overwrites the previous mapping/i);
     expect(SCENARIOS.F2.citizenAction.whatToSay).toMatch(/another bank/i);
     expect(SCENARIOS.F2.citizenAction.whatToSay).toMatch(/if I know it/i);
+  });
+
+  it("uses primary-sourced NPCI contacts before a citizen travels to a bank", () => {
+    for (const failureCode of ["F1", "F2", "F3", "F5"] as const) {
+      const guidance = SCENARIOS[failureCode].citizenAction.beforeYouTravel;
+
+      expect(guidance).toContain("14431");
+      expect(guidance).toContain("1800-891-3333");
+      expect(guidance).toContain("npci.dbtl@npci.org.in");
+      expect(guidance).not.toContain(INCORRECT_BHIM_HELPLINE);
+      expect(
+        SCENARIOS[failureCode].citizenAction.beforeYouTravelProvenance,
+      ).toBe("CITED");
+    }
   });
 });

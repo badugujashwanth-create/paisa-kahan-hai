@@ -17,6 +17,9 @@ export function SiteFooter() {
         <Link className="inline-flex min-h-tap items-center hover:text-primary hover:underline" href="/sources">
           Sources
         </Link>
+        <Link className="inline-flex min-h-tap items-center hover:text-primary hover:underline" href="/check-yourself">
+          Check yourself
+        </Link>
         <a className="inline-flex min-h-tap items-center hover:text-primary hover:underline" href={GITHUB_REPOSITORY_URL}>
           GitHub repository
         </a>

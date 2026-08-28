@@ -186,6 +186,13 @@ export default function SourcesPage() {
             internal numbering. Because of that ambiguity, this prototype tells
             citizens to ask for the form by name rather than by annexure number.
           </p>
+          <p className="mt-5 max-w-4xl border-t border-modelled pt-5 text-lg font-semibold leading-8 text-ink">
+            <strong>Correction:</strong> An earlier version shipped a BHIM/UPI
+            helpline as an Aadhaar-mapper contact under a CITED label. We found
+            that it belongs to a different NPCI service, removed it, and
+            replaced it with NPCI&apos;s primary-sourced DigiSaathi numbers and its
+            mapper-specific APBS escalation address.
+          </p>
         </aside>
       </section>
 

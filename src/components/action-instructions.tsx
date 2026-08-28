@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 import { Prov, type ProvKind } from "@/components/prov";
+import { ESCALATION_LADDER } from "@/lib/escalation";
 import {
   AADHAAR_SEEDING_FORM_NAME,
   FORM_ANNEXURE_HINT,
@@ -65,6 +67,12 @@ export function ActionInstructions({ diagnosis }: ActionInstructionsProps) {
         <div className="mt-4">
           <Prov kind={provenanceKind(action.beforeYouTravelProvenance)} />
         </div>
+        <Link
+          className="mt-4 inline-flex min-h-tap items-center font-black text-primary underline decoration-2 underline-offset-4"
+          href="/check-yourself"
+        >
+          Open the free self-check tools
+        </Link>
       </div>
 
       {isWaitOnly ? (
@@ -188,9 +196,101 @@ export function ActionInstructions({ diagnosis }: ActionInstructionsProps) {
             </div>
           </li>
 
-          <li className="action-step py-7">
+          <li className="action-step border-b border-line py-7">
             <InstructionHeading number={8}>What it costs</InstructionHeading>
             <p className="mt-4 text-lg leading-8 text-ink">{action.costToCitizen}</p>
+          </li>
+
+          <li className="action-step action-step-long py-8">
+            <InstructionHeading number={9}>
+              If the bank still will not help
+            </InstructionHeading>
+            <p className="mt-4 max-w-3xl text-lg leading-8 text-ink">
+              Start at rung 1. Keep every complaint number and written reply,
+              then move down only after the stated waiting time.
+            </p>
+
+            <ol className="mt-7 list-none border-y-4 border-ink p-0 print:mt-2">
+              {ESCALATION_LADDER.map((rung) => (
+                <li
+                  className="border-b-2 border-ink px-4 py-6 last:border-b-0 sm:px-6 print:px-0 print:py-1 print:tracking-[-0.01em]"
+                  key={rung.order}
+                >
+                  <div className="flex items-start gap-3 print:gap-2">
+                    <span
+                      aria-hidden="true"
+                      className="flex size-9 shrink-0 items-center justify-center bg-ink text-base font-black text-paper print:size-6 print:text-[8pt]"
+                    >
+                      {rung.order}
+                    </span>
+                    <h4 className="pt-1 text-xl font-black leading-tight text-ink sm:text-2xl print:text-[10pt]">
+                      {rung.title}
+                    </h4>
+                  </div>
+
+                  <dl className="mt-5 grid gap-5 print:mt-1 print:gap-0">
+                    <div>
+                      <dt className="text-sm font-black uppercase tracking-[0.08em] text-primary">
+                        Who to contact
+                      </dt>
+                      <dd className="mt-2 text-base leading-7 text-ink print:mt-0.5">
+                        {rung.contactWho}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-black uppercase tracking-[0.08em] text-primary">
+                        How to contact them
+                      </dt>
+                      <dd>
+                        <ul className="mt-2 space-y-2 print:mt-0.5 print:space-y-0">
+                          {rung.contactDetails.map((detail) => (
+                            <li className="flex gap-3 text-base leading-7 text-ink" key={detail}>
+                              <span aria-hidden="true" className="font-black">
+                                &bull;
+                              </span>
+                              <span>{detail}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-black uppercase tracking-[0.08em] text-primary">
+                        What to say or file
+                      </dt>
+                      <dd className="mt-2 text-base leading-7 text-ink print:mt-0.5">
+                        {rung.whatToFile}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-black uppercase tracking-[0.08em] text-primary">
+                        When to move to the next rung
+                      </dt>
+                      <dd className="mt-2 text-base font-bold leading-7 text-ink print:mt-0.5">
+                        {rung.waitBeforeEscalating}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-black uppercase tracking-[0.08em] text-primary">
+                        Cost
+                      </dt>
+                      <dd className="mt-2 text-base leading-7 text-ink print:mt-0.5">
+                        {rung.cost}
+                      </dd>
+                    </div>
+                  </dl>
+
+                  <div className="mt-5 print:mt-0 print:[&>span]:min-h-0">
+                    <Prov kind={provenanceKind(rung.provenance)} />
+                  </div>
+                  {rung.verificationNote ? (
+                    <p className="mt-3 border-l-4 border-modelled pl-3 text-sm font-semibold leading-6 text-muted print:mt-1">
+                      {rung.verificationNote}
+                    </p>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
           </li>
         </ol>
       )}

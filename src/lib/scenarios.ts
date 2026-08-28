@@ -25,7 +25,7 @@ const NO_FORM_REQUIRED = "No form is required";
 
 // A free USSD lookup can prevent wasted bus fare for someone without a smartphone or mobile data.
 const BANK_MAPPING_CHECK_BEFORE_TRAVEL =
-  "Dial *99*99# from any phone — no internet needed — to check which bank currently holds your Aadhaar mapping. This is NPCI's free Query Service on Aadhaar Mapper. You can also check the BASE portal on npci.org.in or call NPCI on 1800-120-1740.";
+  "Dial *99*99# from any phone — no internet needed — to check which bank currently holds your Aadhaar mapping. This is NPCI's free Query Service on Aadhaar Mapper. You can also check the BASE portal on npci.org.in, call NPCI DigiSaathi on 14431 or 1800-891-3333, or ask a bank or literate helper to email NPCI's mapper-specific APBS address at npci.dbtl@npci.org.in.";
 
 const PASSED_STAGE_RESULTS: Readonly<Record<StageId, Omit<StageResult, "stageId">>> = {
   SCHEME: {

@@ -32,6 +32,12 @@ export default function HomePage() {
         <p className="mt-4 text-base font-semibold text-muted">
           Helping someone else? This works for that too.
         </p>
+        <Link
+          className="mt-3 inline-flex min-h-tap items-center font-bold text-primary underline decoration-2 underline-offset-4"
+          href="/check-yourself"
+        >
+          Or check your Aadhaar mapping yourself, free, right now
+        </Link>
 
         <nav aria-label="More information" className="mt-7 flex gap-6 border-t border-line pt-4">
           <Link
