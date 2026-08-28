@@ -108,18 +108,21 @@ a {
     text-shadow: none !important;
   }
 
+  /* Reclaimed from whitespace and oversized display headings rather than from body
+     text: the printout is read at a counter by people who may not have their reading
+     glasses, so body size and leading stay where they are. */
   .print-section {
-    margin-top: 0.5rem !important;
-    padding-bottom: 0.3rem !important;
-    padding-top: 0.3rem !important;
+    margin-top: 0.25rem !important;
+    padding-bottom: 0.1rem !important;
+    padding-top: 0.1rem !important;
   }
 
   .print-surface h1 {
-    font-size: 21pt !important;
+    font-size: 18pt !important;
   }
 
   .print-surface h2 {
-    font-size: 14.5pt !important;
+    font-size: 13pt !important;
   }
 
   .print-surface h3 {
@@ -140,8 +143,8 @@ a {
     gap: 0.6rem !important;
     grid-template-columns: 2.25rem minmax(0, 1fr) !important;
     opacity: 1 !important;
-    padding-bottom: 0.3rem !important;
-    padding-top: 0.3rem !important;
+    padding-bottom: 0.15rem !important;
+    padding-top: 0.15rem !important;
     transform: none !important;
   }
 
@@ -221,8 +224,8 @@ a {
     break-inside: avoid;
     margin-left: 0 !important;
     margin-right: 0 !important;
-    padding-bottom: 0.4rem !important;
-    padding-top: 0.4rem !important;
+    padding-bottom: 0.25rem !important;
+    padding-top: 0.25rem !important;
   }
 
   .action-step-long {
@@ -230,8 +233,8 @@ a {
   }
 
   .action-step blockquote {
-    margin-top: 0.45rem !important;
-    padding: 0.65rem !important;
+    margin-top: 0.3rem !important;
+    padding: 0.45rem !important;
   }
 
   .counter-reply {

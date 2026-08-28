@@ -1,5 +1,8 @@
 # Sessions
 
+## 2026-08-28 — Retraction: unsourced codes and harmful USSD advice removed
+- Removed two invented APBS error codes (B08, 207) and the instruction to dial *99*99# "from any phone", which fails on a borrowed phone and reads to a citizen like their Aadhaar was cancelled. Replaced both with descriptions and the BASE click path verified against NPCI's own process flow. Added the over-seeding mechanism to F2, and rebuilt `/sources` around a prominent "What we removed, and why" retraction plus a "Numbers that argue against us" section citing the government's own success rates. Two of the four counter-statistics supplied could not be sourced and were dropped rather than published. Current state: 82 tests and all checks pass, `/trace` is 121 kB First Load JS, and print is back to three legible A4 pages.
+
 ## 2026-08-28 — Offline wiring, mock consent, and compact print
 - Mounted the existing offline registration and metadata; added optional client-only Aadhaar/OTP consent showing a read-only lookup; compacted print to three legible A4 pages. Current state: 80 tests and all checks pass, production is public with an activated service worker, and `/trace` is 120 kB First Load JS.
 

@@ -161,19 +161,49 @@ describe("scenario completeness", () => {
     expect(SCENARIOS.F8.humanHeadline).toMatch(/normally/i);
   });
 
-  it("does not claim primary citations for the modelled B08 and 207 code labels", () => {
-    expect(
-      SCENARIOS.F3.stages.find((stage) =>
-        stage.technicalDetail?.includes("B08"),
-      )?.provenance,
-    ).toBe("MODELLED");
-    expect(
-      SCENARIOS.F4.stages.find((stage) =>
-        stage.technicalDetail?.includes("207"),
-      )?.provenance,
-    ).toBe("MODELLED");
-    expect(SCENARIOS.F3.provenance).toBe("MODELLED");
-    expect(SCENARIOS.F4.provenance).toBe("MODELLED");
+  // Regression guard. We shipped "B08" and "207" as APBS response codes; no primary NPCI,
+  // PFMS or UIDAI source contains either. They must never reappear anywhere a citizen
+  // could read them and repeat them at a bank counter.
+  it("shows no unsourced numeric failure codes anywhere in any scenario", () => {
+    const retractedCodes = [/\bB0?8\b/i, /\b207\b/];
+
+    for (const failureCode of Object.keys(SCENARIOS) as FailureCode[]) {
+      const scenario = SCENARIOS[failureCode];
+      const citizenFacingText = [
+        scenario.humanHeadline,
+        scenario.explanation,
+        ...scenario.stages.flatMap((stage) => [
+          stage.explanation,
+          stage.technicalDetail ?? "",
+        ]),
+        ...Object.values(scenario.citizenAction).flatMap((value) =>
+          typeof value === "string" ? [value] : Array.isArray(value) ? value : [],
+        ),
+      ].join(" ");
+
+      for (const pattern of retractedCodes) {
+        expect(
+          citizenFacingText,
+          `${failureCode} still exposes a retracted code matching ${pattern}`,
+        ).not.toMatch(pattern);
+      }
+    }
+  });
+
+  it("describes each rail failure in words rather than a numeric code", () => {
+    expect(SCENARIOS.F1.stages.find((s) => s.stageId === "MAPPER")?.technicalDetail).toBe(
+      "Aadhaar number not mapped to account number",
+    );
+    expect(SCENARIOS.F3.stages.find((s) => s.stageId === "MAPPER")?.technicalDetail).toBe(
+      "Aadhaar de-seeded from NPCI mapper by the bank",
+    );
+    expect(SCENARIOS.F4.stages.find((s) => s.stageId === "APBS")?.technicalDetail).toBe(
+      "Demographic details do not match Aadhaar",
+    );
+    // Not sourced in PFMS's rejection list or the CAG audit, so it must stay MODELLED.
+    expect(SCENARIOS.F4.stages.find((s) => s.stageId === "APBS")?.provenance).toBe(
+      "MODELLED",
+    );
   });
 
   it("uses the unambiguous NPCI form name and keeps annexure wording as a hint", () => {
@@ -196,17 +226,37 @@ describe("scenario completeness", () => {
     expect(SCENARIOS.F2.citizenAction.whatToSay).toMatch(/if I know it/i);
   });
 
-  it("uses primary-sourced NPCI contacts before a citizen travels to a bank", () => {
+  // Regression guard for the most harmful thing we shipped. The USSD mapper query
+  // authenticates against the Aadhaar-REGISTERED mobile, so a citizen who borrows a
+  // phone gets an error and concludes their Aadhaar has been deleted. It must never
+  // come back, and we must never again tell anyone this works from "any phone".
+  it("never tells a citizen to dial a USSD code before travelling", () => {
+    for (const failureCode of Object.keys(SCENARIOS) as FailureCode[]) {
+      const guidance = SCENARIOS[failureCode].citizenAction.beforeYouTravel;
+
+      expect(guidance).not.toMatch(/\*99/);
+      expect(guidance).not.toMatch(/USSD/i);
+      expect(guidance).not.toMatch(/any phone/i);
+      expect(guidance).not.toContain(INCORRECT_BHIM_HELPLINE);
+    }
+  });
+
+  it("points a citizen at the verified BASE route and an assisted fallback", () => {
     for (const failureCode of ["F1", "F2", "F3", "F5"] as const) {
       const guidance = SCENARIOS[failureCode].citizenAction.beforeYouTravel;
 
-      expect(guidance).toContain("14431");
-      expect(guidance).toContain("1800-891-3333");
-      expect(guidance).toContain("npci.dbtl@npci.org.in");
-      expect(guidance).not.toContain(INCORRECT_BHIM_HELPLINE);
+      // The click path verified against NPCI's own BASE process flow.
+      expect(guidance).toContain("npci.org.in");
+      expect(guidance).toContain("Bharat Aadhaar Seeding Enabler");
+      expect(guidance).toContain("Get Aadhaar Mapped Status");
+      // Every online route needs the Aadhaar-registered mobile, so the citizen must be
+      // told that up front and given a route that works without it.
+      expect(guidance).toMatch(/registered with your Aadhaar/i);
+      expect(guidance).toMatch(/Common Service Centre|bank branch/i);
+      // Mixed sourcing: the click path is cited, the OTP and CSC claims are not.
       expect(
         SCENARIOS[failureCode].citizenAction.beforeYouTravelProvenance,
-      ).toBe("CITED");
+      ).toBe("MODELLED");
     }
   });
 });

@@ -79,7 +79,7 @@ const NPCI_DIGISAATHI: EscalationRung = {
     "Website & chatbot: digisaathi.info",
   ],
   whatToFile:
-    "Not a formal complaint — describe what *99*99# or the NPCI BASE portal showed you, and ask for guidance on the Aadhaar Payment Bridge System / AePS mapping. Use this alongside, not instead of, your written bank complaint.",
+    "Not a formal complaint — describe what the NPCI BASE portal showed you, and ask for guidance on the Aadhaar Payment Bridge System / AePS mapping. Use this alongside, not instead of, your written bank complaint.",
   waitBeforeEscalating:
     "No fixed wait — this is a same-call information line, not a case that needs to run its course.",
   cost: "Free (toll-free number).",

@@ -98,11 +98,12 @@ const RECENT_BANK_OR_AADHAAR_CHANGE_QUESTION: TriageQuestion<RecentBankOrAadhaar
   ],
 };
 
-// A rejection code points at a specific, documented stage (APBS codes B08
-// or 207 — see scenarios.ts); "pending" points upstream at the treasury or
-// department; "successful" despite no money received points at the
-// receiving bank account itself. Asked last because most citizens have to
-// go check their phone or the portal before they can answer it.
+// A stated rejection points at the payment rail itself; "pending" points
+// upstream at the treasury or department; "successful" despite no money
+// received points at the receiving bank account. We ask what the message
+// SAYS rather than for a code number, because the published enumerations
+// disagree with each other — see the note at the top of scenarios.ts.
+// Asked last because most citizens have to go and check before answering.
 const PORTAL_OR_SMS_MESSAGE_QUESTION: TriageQuestion<PortalOrSmsMessageAnswer> = {
   id: "portalOrSmsMessage",
   prompt: "If you have checked a portal, app or SMS, what does it say?",

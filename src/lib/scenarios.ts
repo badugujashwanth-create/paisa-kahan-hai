@@ -7,7 +7,17 @@ import {
 } from "./types";
 
 // Roman-Hindi uses gender-neutral infinitive phrasing because the app cannot know who is speaking.
-// Primary NPCI documentation for the exact APBS response-code labels B08 and 207 could not be located, so those labels are MODELLED rather than CITED.
+//
+// technicalDetail carries a DESCRIPTION and never a numeric return code. Two reasons.
+// First, we previously shipped the codes "B08" and "207"; no primary NPCI, PFMS or UIDAI
+// document contains either, and one of them traces to an unrelated recruitment post code
+// and the other to a paragraph number in a court judgment. They were folklore, and we
+// removed them rather than replace them.
+// Second, we cannot substitute a correct number, because the real enumerations conflict
+// between sources — NPCI's SOP and various state DBT portals number the same failures
+// differently. The descriptive wording, however, is consistent everywhere, so the
+// description alone is the only part we can honestly put in front of a citizen. A citizen
+// quoting a wrong code at a counter is worse off than one describing the problem plainly.
 
 type TerminalStageResult = Readonly<{
   status: "FAILED" | "PENDING";
@@ -23,9 +33,14 @@ export const FORM_ANNEXURE_HINT =
   "Often called Annexure-I at the counter. The annexure number varies between banks — ask for it by the name above.";
 const NO_FORM_REQUIRED = "No form is required";
 
-// A free USSD lookup can prevent wasted bus fare for someone without a smartphone or mobile data.
+// Knowing which bank currently receives the money prevents a wasted trip to the wrong branch.
+// The old USSD advice was removed: that service authenticates against the Aadhaar-REGISTERED
+// mobile number, so a citizen borrowing a neighbour's phone — our exact target user — gets an
+// error and wrongly concludes their Aadhaar is gone. Every remaining online route needs that
+// same registered number for an OTP, which is why the assisted route is named alongside them.
+// Click path verified against NPCI's own BASE process flow (see /sources).
 const BANK_MAPPING_CHECK_BEFORE_TRAVEL =
-  "Dial *99*99# from any phone — no internet needed — to check which bank currently holds your Aadhaar mapping. This is NPCI's free Query Service on Aadhaar Mapper. You can also check the BASE portal on npci.org.in, call NPCI DigiSaathi on 14431 or 1800-891-3333, or ask a bank or literate helper to email NPCI's mapper-specific APBS address at npci.dbtl@npci.org.in.";
+  "Before travelling, find out which bank currently receives your government payments. Use NPCI's BASE portal: go to npci.org.in, open the Consumer tab, choose Bharat Aadhaar Seeding Enabler (BASE), then Get Aadhaar Mapped Status. You will need the mobile number registered with your Aadhaar, because it receives the OTP. The myAadhaar portal at myaadhaar.uidai.gov.in shows the same thing. If you have no smartphone, no internet, or not that phone, a Common Service Centre operator or any bank branch can check this for you.";
 
 const PASSED_STAGE_RESULTS: Readonly<Record<StageId, Omit<StageResult, "stageId">>> = {
   SCHEME: {
@@ -104,12 +119,15 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
     stages: buildStageResults("MAPPER", {
       status: "FAILED",
       explanation: "No active DBT bank was found for your Aadhaar number.",
-      technicalDetail: "NEVER_SEEDED",
+      technicalDetail: "Aadhaar number not mapped to account number",
       provenance: "CITED",
     }),
     citizenAction: {
       beforeYouTravel: BANK_MAPPING_CHECK_BEFORE_TRAVEL,
-      beforeYouTravelProvenance: "CITED",
+      // MODELLED, not CITED: NPCI's BASE process flow verifies the click path exactly, but its
+      // OTP requirement and the Common Service Centre fallback are not in that document. One
+      // chip describes the whole paragraph, so the weaker label wins. /sources splits them out.
+      beforeYouTravelProvenance: "MODELLED",
       whereToGo: "The branch of the bank account where you want future payments.",
       whoToAsk: "The officer handling Aadhaar DBT seeding.",
       exactFormName: AADHAAR_SEEDING_FORM_NAME,
@@ -141,17 +159,24 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
     failureCode: "F2",
     humanHeadline: "Your payment went to a different bank account",
     failedStage: "MAPPER",
+    // The over-seeding mechanism is MODELLED: the one-account rule and the last-seeded-wins
+    // behaviour are documented by NPCI, but how often consent is buried inside onboarding
+    // journeys is an observation about how the rule plays out, not a measured statistic.
+    // Stated as something that can happen, never as a claimed frequency.
     explanation:
-      "The NPCI mapper holds one bank per Aadhaar. A fresh seeding overwrites the previous mapping, so the payment went to the bank seeded most recently, which may hold an older or closed account for you.",
+      "The NPCI mapper holds one bank per Aadhaar. A fresh seeding overwrites the previous mapping, so the payment went to the bank seeded most recently, which may hold an older or closed account for you. The overwrite cannot be undone from the old bank's side, and the consent that causes it is sometimes buried inside a long electronic agreement when opening an account or signing up to a wallet or finance app. So a person can move where all their government money lands without ever realising they agreed to it — and only find out when the money stops arriving.",
     stages: buildStageResults("MAPPER", {
       status: "FAILED",
       explanation: "NPCI found a different bank from the one where you expected the money.",
-      technicalDetail: "MAPPER_OVERWRITTEN",
+      technicalDetail: "Aadhaar mapped to a different bank account",
       provenance: "CITED",
     }),
     citizenAction: {
       beforeYouTravel: BANK_MAPPING_CHECK_BEFORE_TRAVEL,
-      beforeYouTravelProvenance: "CITED",
+      // MODELLED, not CITED: NPCI's BASE process flow verifies the click path exactly, but its
+      // OTP requirement and the Common Service Centre fallback are not in that document. One
+      // chip describes the whole paragraph, so the weaker label wins. /sources splits them out.
+      beforeYouTravelProvenance: "MODELLED",
       whereToGo: "The branch of the bank where you want future DBT money to arrive.",
       whoToAsk: "The officer handling Aadhaar DBT seeding.",
       exactFormName: AADHAAR_SEEDING_FORM_NAME,
@@ -177,7 +202,10 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
       },
     },
     traceCase: GENERIC_TRACE_CASE,
-    provenance: "CITED",
+    // This chip sits directly under the explanation, and the explanation now carries the
+    // MODELLED buried-consent observation alongside the CITED one-account rule. The weaker
+    // label governs the whole paragraph; /sources cites the one-account rule on its own.
+    provenance: "MODELLED",
   },
   F3: {
     failureCode: "F3",
@@ -188,19 +216,22 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
     stages: buildStageResults("MAPPER", {
       status: "FAILED",
       explanation: "The bank's Aadhaar mandate is missing from the central mapper.",
-      technicalDetail: "APBS response code B08",
-      provenance: "MODELLED",
+      technicalDetail: "Aadhaar de-seeded from NPCI mapper by the bank",
+      provenance: "CITED",
     }),
     citizenAction: {
       beforeYouTravel: BANK_MAPPING_CHECK_BEFORE_TRAVEL,
-      beforeYouTravelProvenance: "CITED",
+      // MODELLED, not CITED: NPCI's BASE process flow verifies the click path exactly, but its
+      // OTP requirement and the Common Service Centre fallback are not in that document. One
+      // chip describes the whole paragraph, so the weaker label wins. /sources splits them out.
+      beforeYouTravelProvenance: "MODELLED",
       whereToGo: "The branch where you submitted Aadhaar seeding.",
       whoToAsk: "The Branch Manager, not the counter clerk.",
       exactFormName: AADHAAR_SEEDING_FORM_NAME,
       whatToSay:
-        "My payment failed with code B08 because the bank mandate did not reach the NPCI mapper. Please escalate and upload it again.",
+        "My payment was returned because my Aadhaar is not updated in the NPCI mapper. NPCI's own seeding process says that when this happens the action lies with the bank. Please escalate and upload the mandate again.",
       whatToSayHindiRoman:
-        "Maine Aadhaar seeding form jama kiya tha. B08 bank ki upload ki galti hai. Kripya Branch Manager isse NPCI mapper mein dobara bheje.",
+        "Maine Aadhaar seeding form jama kiya tha, lekin NPCI mapper mein update nahi hua. NPCI ke apne niyam ke anusaar yeh bank ka kaam hai. Kripya Branch Manager isse dobara bhejwaiye.",
       clerkPushback: "NPCI rejected it, so you must contact NPCI yourself.",
       yourReply:
         "NPCI says Aadhaar mapper seeding is the bank's responsibility. Please check the bank's upload and give me a written complaint number.",
@@ -208,7 +239,7 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
         "Bank-acknowledged copy of the NPCI Aadhaar Seeding / DBT Consent Form, if available",
         "Aadhaar card or a clear copy",
         "Bank passbook",
-        "Payment failure screenshot showing B08",
+        "Screenshot or SMS showing the payment failure, if you have one",
       ],
       expectedTimeline: "Ask for correction within 7 working days and a complaint number today.",
       costToCitizen: "No fee. The bank must correct its own upload.",
@@ -231,7 +262,11 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
     stages: buildStageResults("APBS", {
       status: "FAILED",
       explanation: "The personal details in the bank and Aadhaar records did not match.",
-      technicalDetail: "APBS response code 207",
+      // MODELLED, not CITED. F1's and F3's wording is verbatim from primary sources, but
+      // this one is not: neither PFMS's rejection-remedies list nor the CAG audit's recorded
+      // failure reasons contains a demographic-mismatch return at all. The description is
+      // kept because it is plain and carries no invented code, but we do not claim a source.
+      technicalDetail: "Demographic details do not match Aadhaar",
       provenance: "MODELLED",
     }),
     citizenAction: {
@@ -275,12 +310,17 @@ export const SCENARIOS: Readonly<Record<FailureCode, Diagnosis>> = {
     stages: buildStageResults("BANK", {
       status: "FAILED",
       explanation: "The bank could not make the money available in this inactive account.",
-      technicalDetail: "ACCOUNT_DORMANT_OR_KYC_EXPIRED",
-      provenance: "MODELLED",
+      // Wording follows the CAG audit's recorded failure reasons, which list both a dormant
+      // account (no transactions for six months) and a blocked or frozen account.
+      technicalDetail: "Dormant account, or account blocked or frozen",
+      provenance: "CITED",
     }),
     citizenAction: {
       beforeYouTravel: BANK_MAPPING_CHECK_BEFORE_TRAVEL,
-      beforeYouTravelProvenance: "CITED",
+      // MODELLED, not CITED: NPCI's BASE process flow verifies the click path exactly, but its
+      // OTP requirement and the Common Service Centre fallback are not in that document. One
+      // chip describes the whole paragraph, so the weaker label wins. /sources splits them out.
+      beforeYouTravelProvenance: "MODELLED",
       whereToGo: "The branch that holds the inactive account.",
       whoToAsk: "The account service or re-KYC officer.",
       exactFormName: "Re-KYC Form and Account Activation Request",
