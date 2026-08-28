@@ -44,3 +44,12 @@
 **Codex caught:** A final content comparison found that source authority names were implicit in prose and link labels, so Codex exposed all five as scannable `Source:` lines. The initial Vercel preview was also protected by a Vercel login screen, so it could not meet the requested public-access check; Codex preserved the project security setting, deployed to the existing production target, and reran the complete suite there.
 
 **Verified by:** All 38 Vitest tests, ESLint, strict TypeScript, and the production build passed. `/sources` and `/about` each measured 103 kB First Load JS. Fresh Playwright processes at 360px, 768px, and 1280px confirmed both pages, the global footer on every route, trace-to-sources navigation, keyboard access, no overflow or console errors, and HTTP 200 responses from every external source and audit link. The public production alias opened without login.
+
+## Task 6 — Deep-linked results and repository freeze
+**Asked:** Remove the unfinished language route, add initial-load result deep links to `/trace`, write the public reviewer README, and otherwise leave the frozen product unchanged.
+
+**Codex did:** Deleted the confirmed-unlinked route, used the App Router search-parameter hook inside the required local Suspense boundary, and initialized the existing trace state once without URL synchronization. Wrote the plain-English README with demo links, disclosure, Codex contribution record, stack, size, and local commands. Used lean-code on only this diff, Playwright for the query-state and 404 matrix, and vercel-deploy for the production release.
+
+**Codex caught:** Deleting the route left a stale generated `.next` route type that made the first standalone typecheck fail; the normal production build regenerated route types, after which strict TypeScript passed without editing generated files. The first Vercel command also omitted the linked team scope and was rejected before upload, so Codex retried against the existing project scope and deployed successfully.
+
+**Verified by:** All 38 Vitest tests, ESLint, strict TypeScript, and the production build passed. The local build measured 106 kB First Load JS on `/`, 103 kB on `/about` and `/sources`, and 116 kB on `/trace`. Fresh Playwright processes at 360px, 768px, and 1280px verified fixed, empty, whitespace, arbitrary, and absent query states; reset without URL rewriting; `/language` returning 404; no overflow or application errors; and public production access without login.

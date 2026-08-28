@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
+  Suspense,
   type ChangeEvent,
   type FormEvent,
   type MouseEvent,
@@ -32,12 +34,43 @@ const OWNER_COPY: Readonly<
   },
 };
 
-/** Render the payment-ID entry and five-stage diagnosis journey. */
+/** Render the trace journey inside the boundary required by search parameters. */
 export default function TracePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto w-full max-w-3xl px-5 py-9 sm:px-8 sm:py-12">
+          <p className="text-lg font-bold text-ink">Loading payment check…</p>
+        </div>
+      }
+    >
+      <TraceJourney />
+    </Suspense>
+  );
+}
+
+/** Render the payment-ID entry and five-stage diagnosis journey. */
+function TraceJourney() {
+  const searchParams = useSearchParams();
+  const [initialQuery] = useState(() => {
+    const hasPaymentId = searchParams.has("id");
+    const paymentIdFromUrl = hasPaymentId ? (searchParams.get("id") ?? "") : "";
+
+    return {
+      paymentId: paymentIdFromUrl,
+      result: hasPaymentId ? diagnose(paymentIdFromUrl) : null,
+    };
+  });
   const [paymentOwner, setPaymentOwner] = useState<PaymentOwner>("mine");
-  const [paymentId, setPaymentId] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
+  const [paymentId, setPaymentId] = useState(initialQuery.paymentId);
+  const [errorMessage, setErrorMessage] = useState(() =>
+    initialQuery.result && !initialQuery.result.ok
+      ? initialQuery.result.error.message
+      : "",
+  );
+  const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(() =>
+    initialQuery.result?.ok ? initialQuery.result.diagnosis : null,
+  );
   const entryHeadingReference = useRef<HTMLHeadingElement>(null);
   const inputReference = useRef<HTMLInputElement>(null);
   const resultHeadingReference = useRef<HTMLHeadingElement>(null);
