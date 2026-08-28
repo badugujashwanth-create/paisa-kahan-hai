@@ -29,6 +29,12 @@ export default function HomePage() {
         >
           Find my missing payment
         </Link>
+        <Link
+          className="mt-3 flex min-h-tap w-fit items-center font-black text-primary underline decoration-2 underline-offset-4"
+          href="/help"
+        >
+          I don&apos;t have a payment ID
+        </Link>
         <p className="mt-4 text-base font-semibold text-muted">
           Helping someone else? This works for that too.
         </p>
