@@ -128,7 +128,7 @@ export function StageTimeline({ stages }: StageTimelineProps) {
           "--trace-stage-index": revealIndex,
         };
         const markerClassName = isFailed
-          ? "bg-paper text-error ring-4 ring-paper/35"
+          ? "bg-paper text-error ring-4 ring-paper/50"
           : stage.status === "PASSED"
             ? "bg-success text-paper"
             : stage.status === "PENDING"
@@ -137,11 +137,11 @@ export function StageTimeline({ stages }: StageTimelineProps) {
 
         return (
           <li
-            className={`trace-stage grid grid-cols-[2.75rem_minmax(0,1fr)] gap-4 ${
+            className={`trace-stage grid grid-cols-[2.75rem_minmax(0,1fr)] gap-4 sm:gap-5 ${
               isFailed
-                ? "-mx-5 border-y-4 border-error bg-error px-5 py-7 text-paper sm:-mx-8 sm:px-8"
-                : "py-6"
-            } ${stage.status === "NOT_REACHED" ? "opacity-60" : ""}`}
+                ? "-mx-5 border-y-4 border-error bg-error px-5 py-9 text-paper sm:-mx-8 sm:px-8"
+                : "py-5"
+            } ${stage.status === "NOT_REACHED" ? "opacity-55" : ""}`}
             data-stage-status={stage.status}
             key={stage.stageId}
             style={timelineStyle}
@@ -164,28 +164,32 @@ export function StageTimeline({ stages }: StageTimelineProps) {
 
             <div className="min-w-0 pt-0.5">
               <p
-                className={`m-0 text-sm font-black uppercase tracking-[0.09em] ${
+                className={`m-0 font-black uppercase ${
                   isFailed
-                    ? "text-paper"
+                    ? "text-sm tracking-[0.16em] text-paper"
                     : stage.status === "PASSED"
-                      ? "text-success"
+                      ? "text-xs tracking-[0.09em] text-success"
                       : stage.status === "PENDING"
-                        ? "text-ink"
-                        : "text-muted"
+                        ? "text-sm tracking-[0.12em] text-ink"
+                        : "text-xs tracking-[0.09em] text-muted"
                 }`}
               >
                 {STATUS_LABELS[stage.status]}
               </p>
               <h3
-                className={`mt-1 font-black leading-tight ${
-                  isFailed ? "text-3xl text-paper" : "text-xl text-ink"
+                className={`font-black leading-[1.05] ${
+                  isFailed
+                    ? "mt-1.5 text-3xl tracking-[-0.025em] text-paper sm:text-4xl"
+                    : "mt-1 text-xl tracking-[-0.01em] text-ink"
                 }`}
               >
                 {STAGE_NAMES[stage.stageId]}
               </h3>
               <p
-                className={`mt-2 text-base leading-7 ${
-                  isFailed ? "font-semibold text-paper" : "text-ink"
+                className={`${
+                  isFailed
+                    ? "mt-3 text-lg font-semibold leading-7 text-paper sm:text-xl sm:leading-8"
+                    : "mt-1.5 text-base leading-7 text-ink"
                 }`}
               >
                 {stage.explanation}
