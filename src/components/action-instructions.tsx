@@ -117,7 +117,7 @@ export function ActionInstructions({ diagnosis }: ActionInstructionsProps) {
 
           <li className="action-step -mx-5 border-y-4 border-primary bg-primary/5 px-5 py-7 sm:-mx-8 sm:px-8">
             <InstructionHeading number={3}>The form to ask for</InstructionHeading>
-            <p className="mt-5 text-3xl font-black leading-tight text-primary sm:text-4xl">
+            <p className="action-form-name mt-5 text-3xl font-black leading-tight text-primary sm:text-4xl">
               {action.exactFormName}
             </p>
             {usesNpciSeedingForm ? (
@@ -135,7 +135,7 @@ export function ActionInstructions({ diagnosis }: ActionInstructionsProps) {
             <p className="mt-5 text-lg font-semibold leading-8 text-ink">
               &ldquo;{action.whatToSay}&rdquo;
             </p>
-            <blockquote className="mt-5 border-l-8 border-primary bg-primary px-5 py-6 text-paper sm:px-7">
+            <blockquote className="spoken-hindi mt-5 border-l-8 border-primary bg-primary px-5 py-6 text-paper sm:px-7">
               <p className="text-xl font-black leading-8 sm:text-2xl">
                 &ldquo;{action.whatToSayHindiRoman}&rdquo;
               </p>
@@ -155,7 +155,7 @@ export function ActionInstructions({ diagnosis }: ActionInstructionsProps) {
                 <p className="text-sm font-black uppercase tracking-[0.09em] text-error">
                   They will probably say:
                 </p>
-                <p className="mt-2 text-lg font-bold leading-8 text-ink">
+                <p className="clerk-pushback-text mt-2 text-lg font-bold leading-8 text-ink">
                   &ldquo;{action.clerkPushback}&rdquo;
                 </p>
               </div>
@@ -163,7 +163,7 @@ export function ActionInstructions({ diagnosis }: ActionInstructionsProps) {
                 <p className="text-sm font-black uppercase tracking-[0.09em] text-paper">
                   You say:
                 </p>
-                <p className="mt-2 text-xl font-black leading-8 text-paper">
+                <p className="citizen-reply-text mt-2 text-xl font-black leading-8 text-paper">
                   &ldquo;{action.yourReply}&rdquo;
                 </p>
                 <div className="mt-4">
@@ -175,7 +175,7 @@ export function ActionInstructions({ diagnosis }: ActionInstructionsProps) {
 
           <li className="action-step border-b border-line py-7">
             <InstructionHeading number={6}>What to bring</InstructionHeading>
-            <ul className="mt-5 space-y-3">
+            <ul className="documents-checklist mt-5 space-y-3">
               {action.documentsToBring.map((document) => (
                 <li className="flex gap-3 text-lg leading-8 text-ink" key={document}>
                   <span
@@ -201,11 +201,11 @@ export function ActionInstructions({ diagnosis }: ActionInstructionsProps) {
             <p className="mt-4 text-lg leading-8 text-ink">{action.costToCitizen}</p>
           </li>
 
-          <li className="action-step action-step-long py-8">
+          <li className="action-step action-step-long escalation-section py-8">
             <InstructionHeading number={9}>
               If the bank still will not help
             </InstructionHeading>
-            <p className="mt-4 max-w-3xl text-lg leading-8 text-ink">
+            <p className="mt-4 max-w-3xl text-lg leading-8 text-ink print:hidden">
               Start at rung 1. Keep every complaint number and written reply,
               then move down only after the stated waiting time.
             </p>
@@ -213,7 +213,7 @@ export function ActionInstructions({ diagnosis }: ActionInstructionsProps) {
             <ol className="mt-7 list-none border-y-4 border-ink p-0 print:mt-2">
               {ESCALATION_LADDER.map((rung) => (
                 <li
-                  className="border-b-2 border-ink px-4 py-6 last:border-b-0 sm:px-6 print:px-0 print:py-1 print:tracking-[-0.01em]"
+                  className="escalation-rung border-b-2 border-ink px-4 py-6 last:border-b-0 sm:px-6 print:px-0 print:py-1 print:tracking-[-0.01em]"
                   key={rung.order}
                 >
                   <div className="flex items-start gap-3 print:gap-2">
@@ -229,7 +229,7 @@ export function ActionInstructions({ diagnosis }: ActionInstructionsProps) {
                   </div>
 
                   <dl className="mt-5 grid gap-5 print:mt-1 print:gap-0">
-                    <div>
+                    <div className="escalation-print-detail">
                       <dt className="text-sm font-black uppercase tracking-[0.08em] text-primary">
                         Who to contact
                       </dt>
@@ -254,7 +254,7 @@ export function ActionInstructions({ diagnosis }: ActionInstructionsProps) {
                         </ul>
                       </dd>
                     </div>
-                    <div>
+                    <div className="escalation-print-detail">
                       <dt className="text-sm font-black uppercase tracking-[0.08em] text-primary">
                         What to say or file
                       </dt>
@@ -270,7 +270,7 @@ export function ActionInstructions({ diagnosis }: ActionInstructionsProps) {
                         {rung.waitBeforeEscalating}
                       </dd>
                     </div>
-                    <div>
+                    <div className="escalation-print-detail">
                       <dt className="text-sm font-black uppercase tracking-[0.08em] text-primary">
                         Cost
                       </dt>
@@ -284,7 +284,7 @@ export function ActionInstructions({ diagnosis }: ActionInstructionsProps) {
                     <Prov kind={provenanceKind(rung.provenance)} />
                   </div>
                   {rung.verificationNote ? (
-                    <p className="mt-3 border-l-4 border-modelled pl-3 text-sm font-semibold leading-6 text-muted print:mt-1">
+                    <p className="escalation-print-detail mt-3 border-l-4 border-modelled pl-3 text-sm font-semibold leading-6 text-muted print:mt-1">
                       {rung.verificationNote}
                     </p>
                   ) : null}

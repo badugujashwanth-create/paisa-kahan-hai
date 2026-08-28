@@ -8,15 +8,21 @@ import {
   type FormEvent,
   type MouseEvent,
   useEffect,
+  useReducer,
   useRef,
   useState,
 } from "react";
 
 import { ActionInstructions } from "@/components/action-instructions";
+import { MockAadhaarSignIn } from "@/components/mock-aadhaar-sign-in";
 import { Prov, type ProvKind } from "@/components/prov";
 import { StageTimeline } from "@/components/stage-timeline";
 import { DEMO_CASES } from "@/lib/cases";
 import { diagnose } from "@/lib/engine";
+import {
+  INITIAL_MOCK_AUTH_STATE,
+  mockAadhaarAuthReducer,
+} from "@/lib/mock-aadhaar-auth";
 import type { Diagnosis } from "@/lib/types";
 
 type PaymentOwner = "mine" | "helping";
@@ -70,6 +76,10 @@ function TraceJourney() {
   );
   const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(() =>
     initialQuery.result?.ok ? initialQuery.result.diagnosis : null,
+  );
+  const [mockAuthState, dispatchMockAuth] = useReducer(
+    mockAadhaarAuthReducer,
+    INITIAL_MOCK_AUTH_STATE,
   );
   const entryHeadingReference = useRef<HTMLHeadingElement>(null);
   const inputReference = useRef<HTMLInputElement>(null);
@@ -128,14 +138,34 @@ function TraceJourney() {
     }
 
     setErrorMessage("");
+    dispatchMockAuth({ type: "RESET" });
     setDiagnosis(result.diagnosis);
   }
 
-  /** Return to the entry screen for another payment check. */
-  function checkAnotherPayment() {
+  /** Run the diagnosis only after the citizen accepts the read-only mock consent. */
+  function handleMockConsent() {
+    if (mockAuthState.step !== "CONSENT") return;
+
+    const result = diagnose(mockAuthState.aadhaarInput);
+
+    if (!result.ok) {
+      dispatchMockAuth({ type: "RESET" });
+      setErrorMessage(result.error.message);
+      shouldFocusEntry.current = true;
+      return;
+    }
+
+    setErrorMessage("");
+    dispatchMockAuth({ type: "AGREE" });
+    setDiagnosis(result.diagnosis);
+  }
+
+  /** Return to a clean entry screen after another-check or sign-out actions. */
+  function returnToEntry() {
     shouldFocusEntry.current = true;
     setPaymentId("");
     setErrorMessage("");
+    dispatchMockAuth({ type: "RESET" });
     setDiagnosis(null);
   }
 
@@ -154,6 +184,23 @@ function TraceJourney() {
 
       {diagnosis ? (
         <div className="print-surface">
+          {mockAuthState.step === "SIGNED_IN" ? (
+            <aside className="print-hidden mb-7 flex flex-col items-start gap-3 border-l-4 border-accent bg-accent/10 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-wrap items-center gap-3">
+                <Prov kind="mock" />
+                <p className="m-0 text-base font-bold leading-6 text-ink">
+                  Mock signed-in session — read-only. Nothing was changed or stored.
+                </p>
+              </div>
+              <button
+                className="min-h-tap shrink-0 font-black text-primary underline decoration-2 underline-offset-4"
+                onClick={returnToEntry}
+                type="button"
+              >
+                Sign out
+              </button>
+            </aside>
+          ) : null}
           <section aria-labelledby="case-heading" className="print-section">
             <p className="m-0 text-sm font-black uppercase tracking-[0.12em] text-primary">
               {ownerCopy.resultLabel}
@@ -256,7 +303,7 @@ function TraceJourney() {
             </button>
             <button
               className="min-h-tap w-full border-2 border-primary bg-transparent px-5 py-3 text-lg font-black text-primary hover:bg-primary hover:text-paper sm:w-auto"
-              onClick={checkAnotherPayment}
+              onClick={returnToEntry}
               type="button"
             >
               Check another payment
@@ -268,6 +315,12 @@ function TraceJourney() {
             All data shown is synthetic.
           </p>
         </div>
+      ) : mockAuthState.step === "CONSENT" ? (
+        <MockAadhaarSignIn
+          dispatch={dispatchMockAuth}
+          onAgree={handleMockConsent}
+          state={mockAuthState}
+        />
       ) : (
         <div>
           <h1
@@ -336,6 +389,12 @@ function TraceJourney() {
               Check
             </button>
           </form>
+
+          <MockAadhaarSignIn
+            dispatch={dispatchMockAuth}
+            onAgree={handleMockConsent}
+            state={mockAuthState}
+          />
 
           <section
             aria-labelledby="demo-cases-heading"
