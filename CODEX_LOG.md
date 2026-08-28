@@ -35,3 +35,12 @@
 **Codex caught:** The first print layout ran to three pages, so Codex compacted secondary trace detail while preserving the failed stage and complete counter instructions, bringing it to two A4 pages. Final local QA also exposed a collision between a running development server and the production build's shared `.next` cache; Codex stopped only the owned process, rebuilt in isolation, and reran the browser suite against the clean production server.
 
 **Verified by:** All 38 Vitest tests, ESLint, strict TypeScript, npm audit, and the production build passed; `/trace` measured 112 kB First Load JS. Fresh Playwright runs at 360px, 768px, and 1280px verified the home entry, four fixed cases, arbitrary F8 path, complete traces and actions, no overflow or console errors, and a two-page print layout locally and on the public production URL without login.
+
+## Task 5 — Sources and About pages with full disclosure
+**Asked:** Replace the Sources and About stubs with complete, plainly written disclosure pages; add a persistent project footer and a direct provenance explanation link from trace results.
+
+**Codex did:** Used frontend-skill to build two cardless, server-rendered paper-notice pages with a proof-led source ledger and a deliberately dominant real-world implementation section. Added the global footer and trace disclosure link without client JavaScript or dependencies. Used lean-code to retain direct editorial markup, Playwright for functional and visual QA, and vercel-deploy for release.
+
+**Codex caught:** A final content comparison found that source authority names were implicit in prose and link labels, so Codex exposed all five as scannable `Source:` lines. The initial Vercel preview was also protected by a Vercel login screen, so it could not meet the requested public-access check; Codex preserved the project security setting, deployed to the existing production target, and reran the complete suite there.
+
+**Verified by:** All 38 Vitest tests, ESLint, strict TypeScript, and the production build passed. `/sources` and `/about` each measured 103 kB First Load JS. Fresh Playwright processes at 360px, 768px, and 1280px confirmed both pages, the global footer on every route, trace-to-sources navigation, keyboard access, no overflow or console errors, and HTTP 200 responses from every external source and audit link. The public production alias opened without login.

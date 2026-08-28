@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   type ChangeEvent,
   type FormEvent,
@@ -199,8 +200,14 @@ export default function TracePage() {
               {diagnosis.humanHeadline}
             </h2>
             <p className="mt-4 text-lg leading-8 text-ink">{diagnosis.explanation}</p>
-            <div className="mt-5">
+            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
               <Prov kind={diagnosis.provenance.toLowerCase() as ProvKind} />
+              <Link
+                className="print-hidden inline-flex min-h-tap items-center font-bold text-primary underline decoration-2 underline-offset-4"
+                href="/sources"
+              >
+                What do these labels mean?
+              </Link>
             </div>
           </section>
 
